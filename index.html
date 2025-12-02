@@ -288,6 +288,155 @@
             box-shadow: 0 0 30px rgba(168, 192, 255, 0.4);
         }
 
+        /* --- LIGHTBOX PARA ZOOM --- */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #lightbox.active {
+            display: flex;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            animation: zoomIn 0.3s ease;
+        }
+
+        #lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 3rem;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #lightbox-close:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- RESPONSIVIDADE MOBILE --- */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.5rem; }
+            p { font-size: 0.95rem; }
+
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .prev { left: 10px; }
+            .next { right: 10px; }
+
+            .slide-counter {
+                bottom: 15px;
+                right: 15px;
+                font-size: 0.7rem;
+            }
+
+            .slide {
+                padding: 20px;
+            }
+
+            /* Slide 2 - Layout vertical */
+            .slide:nth-child(2) > div {
+                flex-direction: column !important;
+                gap: 20px !important;
+            }
+
+            .slide:nth-child(2) > div > div {
+                text-align: center !important;
+            }
+
+            .slide:nth-child(2) > div > div:nth-child(2) {
+                width: 100px !important;
+                height: 1px !important;
+            }
+
+            .slide:nth-child(2) p {
+                text-align: center !important;
+            }
+
+            /* Galeria - 1 coluna */
+            .gallery-container {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: auto !important;
+                width: 90vw;
+                height: auto;
+                max-height: none;
+            }
+
+            .gallery-item {
+                height: 250px;
+            }
+
+            /* Slide 4 - Layout vertical */
+            .slide:nth-child(4) > div {
+                flex-direction: column !important;
+                height: auto !important;
+                gap: 20px !important;
+            }
+
+            .slide:nth-child(4) img {
+                max-height: 300px !important;
+            }
+
+            /* Texto curatorial */
+            .wall-text-panel {
+                padding: 30px;
+                max-width: 90%;
+            }
+
+            .wall-text-panel:hover {
+                transform: scale(1.02);
+            }
+
+            /* Slide 6 - Grid 1 coluna */
+            .slide:nth-child(6) > div {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Overlay inicial */
+            #startOverlay h1 {
+                font-size: 2rem !important;
+            }
+
+            #startOverlay h2 {
+                font-size: 1rem !important;
+            }
+
+            .enter-btn {
+                padding: 12px 30px;
+                font-size: 0.85rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -303,6 +452,12 @@
     <h2 style="font-size: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 20px;">Ruas que Viraram Rios</h2>
     <!-- BOTÃO ATUALIZADO -->
     <button class="enter-btn" onclick="startExhibition()">ENTRAR NA EXPOSIÇÃO INTERATIVA</button>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+    <span id="lightbox-close">&times;</span>
+    <img id="lightbox-img" src="" alt="">
 </div>
 
 <!-- AMBIENTE DO MUSEU -->
@@ -344,19 +499,19 @@
         </div>
         
         <div class="gallery-container">
-            <div class="gallery-item">
+            <div class="gallery-item" onclick="openLightbox('foto_523f.JPG')">
                 <img src="foto_523f.JPG" alt="Comércio Alagado">
                 <div class="caption">O Mercado vira Porto</div>
             </div>
-            <div class="gallery-item">
+            <div class="gallery-item" onclick="openLightbox('pontilhoes.jpg')">
                 <img src="pontilhoes.jpg" alt="Pontilhões de Madeira">
                 <div class="caption">Arquitetura do Improviso</div>
             </div>
-            <div class="gallery-item">
+            <div class="gallery-item" onclick="openLightbox('os2__060_ER58.jpg')">
                 <img src="os2__060_ER58.jpg" alt="Táxi Canoa">
                 <div class="caption">A Elegância no Caos</div>
             </div>
-            <div class="gallery-item">
+            <div class="gallery-item" onclick="openLightbox('vitrine.jpg')">
                 <img src="vitrine.jpg" alt="Vitrine da Exposição">
                 <div class="caption">Objetos de Memória</div>
             </div>
@@ -441,7 +596,18 @@
     document.addEventListener('keydown', (e) => {
         if (e.key === "ArrowRight") changeSlide(1);
         if (e.key === "ArrowLeft") changeSlide(-1);
+        if (e.key === "Escape") closeLightbox();
     });
+
+    // Lightbox
+    function openLightbox(src) {
+        document.getElementById('lightbox').classList.add('active');
+        document.getElementById('lightbox-img').src = src;
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('active');
+    }
 </script>
 
 </body>
